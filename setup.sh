@@ -105,33 +105,46 @@ else
 fi
 
 # === Telegram config (optional) ===
-if [[ -n "${TELEGRAM_BOT_TOKEN:-}" ]]; then
-    log_ok "Telegram bot token from .env"
-else
-    echo -ne "Telegram bot token (optional): "
-    read -r TELEGRAM_BOT_TOKEN
-fi
+echo ""
+echo -ne "Auto-configure OpenClaw? (Y/n): "
+read -r AUTO_CONFIG
+AUTO_CONFIG="${AUTO_CONFIG:-y}"
 
-if [[ -n "${TELEGRAM_USER_ID:-}" ]]; then
-    log_ok "Telegram user ID from .env"
-else
-    echo -ne "Telegram user ID (optional): "
-    read -r TELEGRAM_USER_ID
-fi
+if [[ "$AUTO_CONFIG" =~ ^[Yy]$ ]]; then
+    if [[ -n "${TELEGRAM_BOT_TOKEN:-}" ]]; then
+        log_ok "Telegram bot token from .env"
+    else
+        echo -ne "Telegram bot token: "
+        read -r TELEGRAM_BOT_TOKEN
+    fi
 
-if [[ -n "${BRAVE_SEARCH_API_KEY:-}" ]]; then
-    log_ok "Brave Search key from .env"
-else
-    echo -ne "Brave Search API key (optional): "
-    read -r BRAVE_SEARCH_API_KEY
-fi
+    if [[ -n "${TELEGRAM_USER_ID:-}" ]]; then
+        log_ok "Telegram user ID from .env"
+    else
+        echo -ne "Telegram user ID: "
+        read -r TELEGRAM_USER_ID
+    fi
 
-if [[ -n "${OPENCLAW_MODEL:-}" ]]; then
-    log_ok "Model from .env (${OPENCLAW_MODEL})"
+    if [[ -n "${BRAVE_SEARCH_API_KEY:-}" ]]; then
+        log_ok "Brave Search key from .env"
+    else
+        echo -ne "Brave Search API key (optional): "
+        read -r BRAVE_SEARCH_API_KEY
+    fi
+
+    if [[ -n "${OPENCLAW_MODEL:-}" ]]; then
+        log_ok "Model from .env (${OPENCLAW_MODEL})"
+    else
+        echo -ne "Model (default: openrouter/minimax/minimax-m2.5): "
+        read -r OPENCLAW_MODEL
+        OPENCLAW_MODEL="${OPENCLAW_MODEL:-openrouter/minimax/minimax-m2.5}"
+    fi
 else
-    echo -ne "Model (default: openrouter/minimax/minimax-m2.5): "
-    read -r OPENCLAW_MODEL
-    OPENCLAW_MODEL="${OPENCLAW_MODEL:-openrouter/minimax/minimax-m2.5}"
+    TELEGRAM_BOT_TOKEN=""
+    TELEGRAM_USER_ID=""
+    BRAVE_SEARCH_API_KEY=""
+    OPENCLAW_MODEL=""
+    log_ok "Skipping auto-config (use openclaw onboard after setup)"
 fi
 
 # === Confirmation ===
