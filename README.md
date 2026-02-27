@@ -56,6 +56,8 @@ The setup wizard runs automatically after provisioning. Use these settings:
 | Default model | openrouter/minimax/minimax-m2.5 |
 | Gateway port | 18789 |
 | Gateway bind | LAN (0.0.0.0) |
+| Gateway auth | Password |
+| Tailscale exposure | Off (No Tailscale exposure) |
 
 Dashboard: `http://<tailscale-ip>:18789`
 
