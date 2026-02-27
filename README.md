@@ -14,10 +14,10 @@ Create a `.env` file or enter values when prompted.
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `TAILSCALE_AUTH_KEY` | Yes | [admin.tailscale.com](https://admin.tailscale.com) → Settings → Keys → Generate auth key |
-| `OPENROUTER_API_KEY` | Yes | [openrouter.ai/keys](https://openrouter.ai/keys) |
-| `OPENAI_API_KEY` | No | For Whisper speech-to-text |
-| `ELEVENLABS_API_KEY` | No | For text-to-speech |
+| `TAILSCALE_AUTH_KEY` | Yes | [login.tailscale.com/admin/settings/keys](https://login.tailscale.com/admin/settings/keys) |
+| `OPENROUTER_API_KEY` | Yes | [openrouter.ai/settings/keys](https://openrouter.ai/settings/keys) |
+| `OPENAI_API_KEY` | No | [platform.openai.com/api-keys](https://platform.openai.com/api-keys) |
+| `ELEVENLABS_API_KEY` | No | [elevenlabs.io/app/settings/api-keys](https://elevenlabs.io/app/settings/api-keys) |
 
 ## Quick Start
 
