@@ -149,7 +149,7 @@ if [[ $SSH_EXIT_CODE -eq 0 ]]; then
     # print dashboard URL after setup completes
     echo ""
     echo "=============================================="
-    TAILSCALE_HOSTNAME=$(ssh "root@${TAILSCALE_IP}" "tailscale status --json | jq -r '.Self.DNSName' | sed 's/\.$//'" 2>/dev/null)
+    TAILSCALE_HOSTNAME=$(ssh "root@${TAILSCALE_IP}" "tailscale status --self --json | grep -o '\"DNSName\":\"[^\"]*\"' | cut -d'\"' -f4 | sed 's/\.$//'" 2>/dev/null)
     if [[ -n "${TAILSCALE_HOSTNAME}" ]]; then
         log_ok "Dashboard: https://${TAILSCALE_HOSTNAME}"
     else
