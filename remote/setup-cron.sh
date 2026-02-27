@@ -19,4 +19,4 @@ docker compose up -d openclaw-gateway >> "$LOG" 2>&1
 echo "[$(date -Iseconds)] Update complete" >> "$LOG"
 EOF
 chmod +x /usr/local/bin/openclaw-update.sh
-(crontab -l 2>/dev/null | grep -v openclaw-update; echo "0 3 * * * /usr/local/bin/openclaw-update.sh") | crontab -
+{ crontab -l 2>/dev/null | grep -v openclaw-update || true; echo "0 3 * * * /usr/local/bin/openclaw-update.sh"; } | crontab -
