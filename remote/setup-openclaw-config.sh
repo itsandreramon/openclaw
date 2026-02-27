@@ -1,5 +1,5 @@
 #!/bin/bash
-# configure openclaw via cli
+# configure openclaw via config file
 set -euo pipefail
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
@@ -16,21 +16,41 @@ if [[ -z "$TELEGRAM_BOT_TOKEN" ]]; then
     exit 0
 fi
 
-# initialize config
-openclaw setup >/dev/null 2>&1 || true
+mkdir -p /root/.openclaw
 
-# set model with free fallback (llama 3.3 70b supports tool use)
-openclaw config set agents.defaults.model.primary "${OPENCLAW_MODEL}" >/dev/null 2>&1
-openclaw config set agents.defaults.model.fallbacks "[\"meta-llama/llama-3.3-70b-instruct:free\"]" >/dev/null 2>&1
-
-# configure telegram
-openclaw config set channels.telegram.enabled true >/dev/null 2>&1
-openclaw config set channels.telegram.botToken "${TELEGRAM_BOT_TOKEN}" >/dev/null 2>&1
-openclaw config set channels.telegram.dmPolicy "allowlist" >/dev/null 2>&1
-openclaw config set channels.telegram.allowFrom "[\"tg:${TELEGRAM_USER_ID}\"]" >/dev/null 2>&1
-
-# configure web search if api key provided
+# build web search config if api key provided
+WEB_SEARCH_CONFIG=""
 if [[ -n "$BRAVE_SEARCH_API_KEY" ]]; then
-    openclaw config set tools.web.search.provider "brave" >/dev/null 2>&1
-    openclaw config set tools.web.search.apiKey "${BRAVE_SEARCH_API_KEY}" >/dev/null 2>&1
+    WEB_SEARCH_CONFIG=',
+  "tools": {
+    "web": {
+      "search": {
+        "provider": "brave",
+        "apiKey": "'"${BRAVE_SEARCH_API_KEY}"'"
+      }
+    }
+  }'
 fi
+
+cat > /root/.openclaw/openclaw.json << EOF
+{
+  "agents": {
+    "defaults": {
+      "model": {
+        "primary": "${OPENCLAW_MODEL}",
+        "fallbacks": ["meta-llama/llama-3.3-70b-instruct:free"]
+      }
+    }
+  },
+  "channels": {
+    "telegram": {
+      "enabled": true,
+      "botToken": "${TELEGRAM_BOT_TOKEN}",
+      "dmPolicy": "allowlist",
+      "allowFrom": ["tg:${TELEGRAM_USER_ID}"]
+    }
+  }${WEB_SEARCH_CONFIG}
+}
+EOF
+
+chmod 600 /root/.openclaw/openclaw.json
