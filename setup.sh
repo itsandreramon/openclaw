@@ -121,7 +121,7 @@ VPS_HOST=$(./local/create-server.sh "${SERVER_NAME}" "${SERVER_TYPE}" "${SERVER_
 # === Run remote setup ===
 scp -q -o StrictHostKeyChecking=accept-new -r ./remote "root@${VPS_HOST}:/tmp/" || log_fail "Failed to upload scripts"
 
-ssh -t "root@${VPS_HOST}" "
+ssh "root@${VPS_HOST}" "
     export TAILSCALE_AUTH_KEY='${TAILSCALE_AUTH_KEY}'
     export OPENROUTER_API_KEY='${OPENROUTER_API_KEY}'
     export MACBOOK_TAILSCALE_IP='${MACBOOK_TAILSCALE_IP}'

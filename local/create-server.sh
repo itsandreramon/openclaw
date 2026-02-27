@@ -24,7 +24,7 @@ hcloud server create \
     --location "${SERVER_LOCATION}" \
     --image ubuntu-24.04 \
     --ssh-key "${SSH_KEY_NAME}" \
-    >/dev/null || log_fail "Failed to create server"
+    >/dev/null 2>&1 || log_fail "Failed to create server"
 
 VPS_HOST=$(hcloud server ip "${SERVER_NAME}")
 ssh-keygen -R "${VPS_HOST}" 2>/dev/null || true
