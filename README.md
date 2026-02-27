@@ -58,6 +58,12 @@ The setup wizard runs automatically after provisioning. Use these settings:
 | Gateway bind | LAN (0.0.0.0) |
 | Gateway auth | Password |
 | Tailscale exposure | Off (No Tailscale exposure) |
+| Enter Telegram bot token | Your bot token from @BotFather |
+| Select a channel | Telegram (Bot API) |
+| Select a channel | Finished |
+| Configure DM access policies now? | Yes |
+| Telegram DM policy | Allowlist (specific users only) |
+| Telegram user id | Your user ID from @userinfobot |
 
 Dashboard: `http://<tailscale-ip>:18789`
 
