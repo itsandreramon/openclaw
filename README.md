@@ -65,6 +65,8 @@ The setup wizard runs automatically after provisioning. Use these settings:
 | Configure DM access policies now? | Yes |
 | Telegram DM policy | Allowlist (specific users only) |
 | Telegram user id | Your user ID from @userinfobot |
+| Install missing skill dependencies | Skip for now |
+| Enable hooks | session-memory |
 
 Dashboard: `https://<hostname>.<tailnet>.ts.net`
 
