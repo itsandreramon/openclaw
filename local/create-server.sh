@@ -14,6 +14,14 @@ SSH_KEY_NAME="${4:?SSH key name required}"
 log_step "Creating server"
 
 if hcloud server describe "${SERVER_NAME}" &>/dev/null; then
+    # backup openclaw config before deleting
+    OLD_IP=$(hcloud server ip "${SERVER_NAME}")
+    if ssh -o ConnectTimeout=5 -o StrictHostKeyChecking=no "root@${OLD_IP}" "test -f /root/.openclaw/openclaw.json" 2>/dev/null; then
+        mkdir -p ../backups
+        BACKUP_FILE="../backups/openclaw-$(date +%Y%m%d-%H%M%S).json"
+        scp -o ConnectTimeout=5 -o StrictHostKeyChecking=no "root@${OLD_IP}:/root/.openclaw/openclaw.json" "${BACKUP_FILE}" 2>/dev/null
+        log_ok "Config backed up to ${BACKUP_FILE}"
+    fi
     hcloud server delete "${SERVER_NAME}" >/dev/null || log_fail "Failed to delete existing server"
     sleep 2
 fi
