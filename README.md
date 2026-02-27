@@ -68,7 +68,32 @@ The setup wizard runs automatically after provisioning. Use these settings:
 | Install missing skill dependencies | Skip for now |
 | Enable hooks | session-memory |
 
-Dashboard: `https://<hostname>.<tailnet>.ts.net`
+## Accessing the Dashboard
+
+After setup, access OpenClaw via HTTPS on your tailnet:
+
+```
+https://<hostname>.<tailnet>.ts.net
+```
+
+To find your exact URL:
+
+```bash
+ssh root@<tailscale-ip>
+tailscale serve status
+```
+
+This shows something like:
+
+```
+https://openclaw-7.tail9b110d.ts.net (tailnet only)
+|-- / proxy http://127.0.0.1:18789
+```
+
+On first visit, you'll need to pair your browser:
+
+1. On the VPS, run `docker compose run --rm openclaw-cli pair`
+2. Enter the pairing code in your browser
 
 ## Configure Telegram & Web Search
 
