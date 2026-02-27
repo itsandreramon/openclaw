@@ -92,8 +92,12 @@ https://openclaw-7.tail9b110d.ts.net (tailnet only)
 
 On first visit, you'll need to pair your browser:
 
-1. On the VPS, run `docker compose run --rm openclaw-cli pair`
-2. Enter the pairing code in your browser
+1. Request pairing from the dashboard (shows a pairing code)
+2. On the VPS, approve it:
+   ```bash
+   docker compose run --rm openclaw-cli pairing list    # see pending requests
+   docker compose run --rm openclaw-cli pairing approve <code>
+   ```
 
 ## Configure Telegram & Web Search
 
