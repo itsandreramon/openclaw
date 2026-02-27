@@ -32,9 +32,10 @@ hcloud context create openclaw
 
 The setup script will:
 1. Upload your SSH key to Hetzner (if not already present)
-2. Prompt for API keys (or load from `.env`)
-3. Auto-detect your Mac's Tailscale IP
-4. Create the VPS and run remote init scripts
+2. Fetch available server types and locations from Hetzner
+3. Prompt for API keys (or load from `.env`)
+4. Auto-detect your Mac's Tailscale IP
+5. Create the VPS (default: cx23 ~€3.50/mo) and run remote init scripts
 
 The remote init provisions:
 - 4GB swap
