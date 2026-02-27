@@ -55,7 +55,7 @@ The setup will:
 
 ## Post-Setup
 
-SSH in and run Docker setup:
+After VPS setup completes, SSH in via Tailscale and start OpenClaw:
 
 ```bash
 ssh root@<tailscale-ip>
@@ -63,7 +63,9 @@ cd /opt/openclaw
 ./docker-setup.sh
 ```
 
-Access dashboard: `http://<tailscale-ip>:18789`
+If you skipped auto-config during setup, run `openclaw onboard` inside the container to configure interactively.
+
+Dashboard: `http://<tailscale-ip>:18789`
 
 ## Managing
 
