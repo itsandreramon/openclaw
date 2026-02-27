@@ -7,7 +7,7 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 # shellcheck source=common.sh
 source ./common.sh
 
-TOTAL_STEPS=7
+TOTAL_STEPS=8
 CURRENT_STEP=0
 
 run_step() {
@@ -41,6 +41,18 @@ run_step "Environment" ./setup-env.sh
 run_step "OpenClaw config" ./setup-openclaw-config.sh
 run_step "Auto-updates" ./setup-cron.sh
 
+# run docker setup
+CURRENT_STEP=$((CURRENT_STEP + 1))
+echo -e "\n${YELLOW}[${CURRENT_STEP}/${TOTAL_STEPS}]${NC} Docker setup (this may take a few minutes)"
+cd /opt/openclaw
+if ./docker-setup.sh </dev/null >/dev/null 2>&1; then
+    echo -e "${GREEN}[OK]${NC} Docker setup"
+else
+    echo -e "${RED}[FAIL]${NC} Docker setup"
+    exit 1
+fi
+cd /tmp/remote
+
 # summary before firewall cuts public SSH
 echo ""
 echo "=============================================="
@@ -48,12 +60,6 @@ echo -e "${GREEN}VPS SETUP COMPLETE${NC}"
 echo "=============================================="
 echo ""
 echo "Tailscale IP: ${TAILSCALE_IP}"
-echo ""
-echo "Next steps:"
-echo "  ssh root@${TAILSCALE_IP}"
-echo "  cd /opt/openclaw"
-echo "  ./docker-setup.sh"
-echo ""
 echo "Dashboard: http://${TAILSCALE_IP}:18789"
 echo "=============================================="
 echo ""
