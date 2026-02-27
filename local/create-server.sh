@@ -15,13 +15,16 @@ log_step "Creating server"
 
 if hcloud server describe "${SERVER_NAME}" &>/dev/null; then
     # backup openclaw config before deleting
-    OLD_IP=$(hcloud server ip "${SERVER_NAME}")
-    if ssh -o ConnectTimeout=5 -o StrictHostKeyChecking=no "root@${OLD_IP}" "test -f /root/.openclaw/openclaw.json" 2>/dev/null; then
-        mkdir -p ../backups
-        BACKUP_FILE="../backups/openclaw-$(date +%Y%m%d-%H%M%S).json"
-        scp -o ConnectTimeout=5 -o StrictHostKeyChecking=no "root@${OLD_IP}:/root/.openclaw/openclaw.json" "${BACKUP_FILE}" 2>/dev/null
-        log_ok "Config backed up to ${BACKUP_FILE}"
-    fi
+    # try tailscale hostname first (firewall blocks public IP), then fall back to public IP
+    for BACKUP_IP in "${SERVER_NAME}" "$(hcloud server ip "${SERVER_NAME}")"; do
+        if ssh -o ConnectTimeout=5 -o StrictHostKeyChecking=no "root@${BACKUP_IP}" "test -f /root/.openclaw/openclaw.json" 2>/dev/null; then
+            mkdir -p ../backups
+            BACKUP_FILE="../backups/openclaw-$(date +%Y%m%d-%H%M%S).json"
+            scp -o ConnectTimeout=5 -o StrictHostKeyChecking=no "root@${BACKUP_IP}:/root/.openclaw/openclaw.json" "${BACKUP_FILE}" 2>/dev/null
+            log_ok "Config backed up to ${BACKUP_FILE}"
+            break
+        fi
+    done
     hcloud server delete "${SERVER_NAME}" >/dev/null || log_fail "Failed to delete existing server"
     sleep 2
 fi
