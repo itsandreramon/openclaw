@@ -19,12 +19,14 @@ Note: This repo uses native installation (not Docker) because Docker browser sup
 
 ## Writing Scripts
 
-**Local scripts (`local/`):** Must be Zsh compatible (macOS default shell). Avoid Bash 4+ features:
-- Use `[[ "$VAR" =~ ^[Yy]$ ]]` instead of `${VAR,,}` for case-insensitive comparison
-- Use `$(command)` instead of backticks
-- Avoid associative arrays (`declare -A`)
+All scripts use `#!/bin/bash` and are validated with shellcheck.
 
-**Remote scripts (`remote/`):** Run on Ubuntu VPS with Bash. Standard Bash features are fine.
+**Local scripts (`local/`, `setup.sh`):** Run on macOS with bash. Avoid Bash 4+ features (macOS ships with Bash 3.2):
+- No associative arrays (`declare -A`)
+- No `${VAR,,}` lowercase expansion
+- No `|&` pipe shorthand
+
+**Remote scripts (`remote/`):** Run on Ubuntu VPS with Bash 5+. All bash features available.
 
 ## Project Structure
 
