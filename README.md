@@ -49,7 +49,7 @@ The setup wizard runs automatically after provisioning. Use these settings:
 | Continue? | Yes |
 | Onboarding mode | Manual |
 | What do you want to set up? | Local gateway (this machine) |
-| Workspace directory | /home/node/.openclaw/workspace |
+| Workspace directory | (press Enter for default) |
 | Model/auth provider | OpenRouter |
 | How do you want to provide this API key? | Paste API key now |
 | Use existing OPENROUTER_API_KEY? | Yes |
@@ -58,6 +58,7 @@ The setup wizard runs automatically after provisioning. Use these settings:
 | Gateway bind | Loopback (127.0.0.1) |
 | Gateway auth | Password |
 | Tailscale exposure | Serve |
+| Reset Tailscale serve/funnel on exit? | No |
 | Enter Telegram bot token | Your bot token from @BotFather |
 | Select a channel | Telegram (Bot API) |
 | Select a channel | Finished |
