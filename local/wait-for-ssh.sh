@@ -9,19 +9,17 @@ source ./common.sh
 VPS_HOST="${1:?VPS host required}"
 MAX_ATTEMPTS="${2:-30}"
 
-log_step "Waiting for server to become accessible..."
+log_step "Waiting for SSH"
 ATTEMPT=0
 while [[ $ATTEMPT -lt $MAX_ATTEMPTS ]]; do
-    if ssh -o ConnectTimeout=5 -o BatchMode=yes -o StrictHostKeyChecking=accept-new "root@${VPS_HOST}" "echo 'SSH OK'" &>/dev/null; then
+    if ssh -o ConnectTimeout=5 -o BatchMode=yes -o StrictHostKeyChecking=accept-new "root@${VPS_HOST}" "echo ok" &>/dev/null; then
         break
     fi
     ATTEMPT=$((ATTEMPT + 1))
-    echo -n "."
     sleep 5
 done
-echo ""
 
 if [[ $ATTEMPT -ge $MAX_ATTEMPTS ]]; then
     log_fail "Server not accessible after ${MAX_ATTEMPTS} attempts"
 fi
-log_ok "SSH connection established"
+log_ok "SSH connected (${VPS_HOST})"

@@ -11,13 +11,10 @@ SERVER_TYPE="${2:?Server type required}"
 SERVER_LOCATION="${3:?Server location required}"
 SSH_KEY_NAME="${4:?SSH key name required}"
 
-log_step "Creating Hetzner server '${SERVER_NAME}'..."
+log_step "Creating server"
 
-# delete if server exists
 if hcloud server describe "${SERVER_NAME}" &>/dev/null; then
-    log_warn "Server '${SERVER_NAME}' already exists, deleting..."
-    hcloud server delete "${SERVER_NAME}" || log_fail "Failed to delete server"
-    log_ok "Server deleted"
+    hcloud server delete "${SERVER_NAME}" >/dev/null || log_fail "Failed to delete existing server"
     sleep 2
 fi
 
@@ -27,11 +24,10 @@ hcloud server create \
     --location "${SERVER_LOCATION}" \
     --image ubuntu-24.04 \
     --ssh-key "${SSH_KEY_NAME}" \
-    || log_fail "Failed to create server"
-
-log_ok "Server created"
+    >/dev/null || log_fail "Failed to create server"
 
 VPS_HOST=$(hcloud server ip "${SERVER_NAME}")
-log_ok "Server IP: ${VPS_HOST}"
+ssh-keygen -R "${VPS_HOST}" 2>/dev/null || true
 
+log_ok "Server created (${VPS_HOST})"
 echo "${VPS_HOST}"

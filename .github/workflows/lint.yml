@@ -13,7 +13,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install shellcheck
+        run: sudo apt-get install -y shellcheck
+
       - name: Lint scripts
-        uses: ludeeus/action-shellcheck@master
-        with:
-          scandir: '.'
+        run: find . -name '*.sh' -type f | xargs shellcheck -x -e SC1091
