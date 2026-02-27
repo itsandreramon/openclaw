@@ -42,8 +42,20 @@ Run `./setup.sh` to:
 
 ## Post-Setup
 
-The setup wizard runs automatically after provisioning. Complete the interactive
-onboarding to configure your instance.
+The setup wizard runs automatically after provisioning. Use these settings:
+
+| Prompt | Selection |
+|--------|-----------|
+| Continue? | Yes |
+| Onboarding mode | Manual |
+| What do you want to set up? | Local gateway (this machine) |
+| Workspace directory | /home/node/.openclaw/workspace |
+| Model/auth provider | OpenRouter |
+| How do you want to provide this API key? | Paste API key now |
+| Use existing OPENROUTER_API_KEY? | Yes |
+| Default model | openrouter/minimax/minimax-m2.5 |
+| Gateway port | 18789 |
+| Gateway bind | LAN (0.0.0.0) |
 
 Dashboard: `http://<tailscale-ip>:18789`
 
