@@ -149,13 +149,7 @@ if [[ $SSH_EXIT_CODE -eq 0 ]]; then
     # print dashboard URL after setup completes
     echo ""
     echo "=============================================="
-    TAILSCALE_SUFFIX=$(ssh "root@${TAILSCALE_IP}" "tailscale status --self --json | grep -m1 MagicDNSSuffix | cut -d'\"' -f4" 2>/dev/null)
-    TAILSCALE_HOSTNAME=$(ssh "root@${TAILSCALE_IP}" "hostname" 2>/dev/null)
-    if [[ -n "${TAILSCALE_SUFFIX}" && -n "${TAILSCALE_HOSTNAME}" ]]; then
-        log_ok "Dashboard: https://${TAILSCALE_HOSTNAME}.${TAILSCALE_SUFFIX}"
-    else
-        log_ok "Dashboard: https://<hostname>.<tailnet>.ts.net"
-    fi
+    log_ok "Dashboard: http://${TAILSCALE_IP}:18789"
     echo "=============================================="
 else
     log_fail "Setup failed (exit code ${SSH_EXIT_CODE})"

@@ -6,7 +6,7 @@ Automated OpenClaw deployment on Hetzner with Tailscale and Docker.
 
 - macOS with Homebrew
 - Hetzner account
-- Tailscale account with HTTPS enabled ([login.tailscale.com/admin/dns](https://login.tailscale.com/admin/dns) → Enable HTTPS)
+- Tailscale account
 
 ## Environment Variables
 
@@ -55,10 +55,9 @@ The setup wizard runs automatically after provisioning. Use these settings:
 | Use existing OPENROUTER_API_KEY? | Yes |
 | Default model | openrouter/minimax/minimax-m2.5 |
 | Gateway port | 18789 |
-| Gateway bind | Loopback (127.0.0.1) |
+| Gateway bind | LAN (0.0.0.0) |
 | Gateway auth | Password |
-| Tailscale exposure | Serve |
-| Reset Tailscale serve/funnel on exit? | No |
+| Tailscale exposure | Off (No Tailscale exposure) |
 | Enter Telegram bot token | Your bot token from @BotFather |
 | Select a channel | Telegram (Bot API) |
 | Select a channel | Finished |
@@ -68,7 +67,7 @@ The setup wizard runs automatically after provisioning. Use these settings:
 | Install missing skill dependencies | Skip for now |
 | Enable hooks | session-memory |
 
-Dashboard: `https://<hostname>.<tailnet>.ts.net`
+Dashboard: `http://<tailscale-ip>:18789`
 
 ## Configure Telegram & Web Search
 
@@ -99,5 +98,5 @@ docker compose restart openclaw-gateway
 
 - SSH restricted to your Mac's Tailscale IP only
 - UFW blocks all public access
-- Gateway accessible via Tailscale Serve (HTTPS)
+- Gateway accessible via Tailscale (HTTP over private network)
 - No public ports exposed
