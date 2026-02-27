@@ -80,15 +80,6 @@ docker compose run --rm openclaw-cli config set tools.web.search.apiKey "YOUR_BR
 docker compose restart openclaw-gateway
 ```
 
-## Managing
-
-```bash
-cd /opt/openclaw
-docker compose ps          # status
-docker compose logs -f     # logs
-docker compose restart     # restart
-```
-
 ## Security
 
 - SSH restricted to your Mac's Tailscale IP only
