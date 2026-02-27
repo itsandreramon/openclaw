@@ -146,11 +146,15 @@ if [[ $SSH_EXIT_CODE -eq 0 ]]; then
     echo ""
     ssh -t "root@${TAILSCALE_IP}" "cd /opt/openclaw && ./docker-setup.sh"
 
-    # configure allowed origins for dashboard access
+    # configure tailscale serve for HTTPS access
     echo ""
-    log_step "Configuring dashboard access"
-    ssh "root@${TAILSCALE_IP}" "cd /opt/openclaw && docker compose run --rm openclaw-cli config set gateway.controlUi.allowedOrigins '[\"http://${TAILSCALE_IP}:18789\"]' && docker compose restart openclaw-gateway" >/dev/null 2>&1
-    log_ok "Dashboard accessible at http://${TAILSCALE_IP}:18789"
+    log_step "Configuring Tailscale Serve (HTTPS)"
+    TAILSCALE_HOSTNAME=$(ssh "root@${TAILSCALE_IP}" "tailscale status --json | jq -r '.Self.DNSName' | sed 's/\.$//'")
+    ssh "root@${TAILSCALE_IP}" "tailscale serve --bg --https=443 http://localhost:18789" >/dev/null 2>&1
+
+    # configure allowed origins for dashboard access
+    ssh "root@${TAILSCALE_IP}" "cd /opt/openclaw && docker compose run --rm openclaw-cli config set gateway.controlUi.allowedOrigins '[\"https://${TAILSCALE_HOSTNAME}\"]' && docker compose restart openclaw-gateway" >/dev/null 2>&1
+    log_ok "Dashboard accessible at https://${TAILSCALE_HOSTNAME}"
 else
     log_fail "Setup failed (exit code ${SSH_EXIT_CODE})"
 fi

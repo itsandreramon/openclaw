@@ -55,7 +55,7 @@ The setup wizard runs automatically after provisioning. Use these settings:
 | Use existing OPENROUTER_API_KEY? | Yes |
 | Default model | openrouter/minimax/minimax-m2.5 |
 | Gateway port | 18789 |
-| Gateway bind | LAN (0.0.0.0) |
+| Gateway bind | Loopback (127.0.0.1) |
 | Gateway auth | Password |
 | Tailscale exposure | Off (No Tailscale exposure) |
 | Enter Telegram bot token | Your bot token from @BotFather |
@@ -65,7 +65,7 @@ The setup wizard runs automatically after provisioning. Use these settings:
 | Telegram DM policy | Allowlist (specific users only) |
 | Telegram user id | Your user ID from @userinfobot |
 
-Dashboard: `http://<tailscale-ip>:18789`
+Dashboard: `https://<hostname>.<tailnet>.ts.net`
 
 ## Configure Telegram & Web Search
 
@@ -96,5 +96,5 @@ docker compose restart openclaw-gateway
 
 - SSH restricted to your Mac's Tailscale IP only
 - UFW blocks all public access
-- Gateway only accessible via Tailscale
+- Gateway accessible via Tailscale Serve (HTTPS)
 - No public ports exposed
