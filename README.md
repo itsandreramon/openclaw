@@ -20,7 +20,7 @@ Secure OpenClaw deployment on Hetzner with Tailscale and Docker.
 | `ELEVENLABS_API_KEY` | No | For text-to-speech |
 | `TELEGRAM_BOT_TOKEN` | No | Telegram bot token for non-interactive setup |
 | `TELEGRAM_USER_ID` | No | Your Telegram user ID (for allowlist) |
-| `OPENCLAW_MODEL` | No | Model to use (default: `openrouter/minimax/MiniMax-M1`) |
+| `OPENCLAW_MODEL` | No | Model to use (default: `openrouter/minimax/minimax-m2.5`) |
 | `BRAVE_SEARCH_API_KEY` | No | Brave Search API key for web search |
 
 ## Quick Start

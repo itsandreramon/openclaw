@@ -1,5 +1,5 @@
 #!/bin/bash
-# create openclaw configuration file
+# configure openclaw via cli
 set -euo pipefail
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
@@ -8,7 +8,7 @@ source ./common.sh
 
 TELEGRAM_BOT_TOKEN="${TELEGRAM_BOT_TOKEN:-}"
 TELEGRAM_USER_ID="${TELEGRAM_USER_ID:-}"
-OPENCLAW_MODEL="${OPENCLAW_MODEL:-openrouter/minimax/MiniMax-M1}"
+OPENCLAW_MODEL="${OPENCLAW_MODEL:-openrouter/minimax/minimax-m2.5}"
 BRAVE_SEARCH_API_KEY="${BRAVE_SEARCH_API_KEY:-}"
 
 # skip if no telegram config provided
@@ -17,37 +17,24 @@ if [[ -z "$TELEGRAM_BOT_TOKEN" ]]; then
     exit 0
 fi
 
-log_step "Creating OpenClaw config"
+log_step "Configuring OpenClaw"
 
-mkdir -p /root/.openclaw
+# initialize config
+openclaw setup >/dev/null 2>&1 || true
 
-cat > /root/.openclaw/openclaw.json << EOF
-{
-  "agents": {
-    "defaults": {
-      "model": {
-        "primary": "${OPENCLAW_MODEL}"
-      }
-    }
-  },
-  "channels": {
-    "telegram": {
-      "enabled": true,
-      "botToken": "${TELEGRAM_BOT_TOKEN}",
-      "dmPolicy": "allowlist",
-      "allowFrom": ["tg:${TELEGRAM_USER_ID}"]
-    }
-  },
-  "tools": {
-    "web": {
-      "search": {
-        "provider": "brave",
-        "apiKey": "${BRAVE_SEARCH_API_KEY}"
-      }
-    }
-  }
-}
-EOF
+# set model
+openclaw config set agents.defaults.model.primary "${OPENCLAW_MODEL}" >/dev/null 2>&1
 
-chmod 600 /root/.openclaw/openclaw.json
-log_ok "OpenClaw config created"
+# configure telegram
+openclaw config set channels.telegram.enabled true >/dev/null 2>&1
+openclaw config set channels.telegram.botToken "${TELEGRAM_BOT_TOKEN}" >/dev/null 2>&1
+openclaw config set channels.telegram.dmPolicy "allowlist" >/dev/null 2>&1
+openclaw config set channels.telegram.allowFrom "[\"tg:${TELEGRAM_USER_ID}\"]" >/dev/null 2>&1
+
+# configure web search if api key provided
+if [[ -n "$BRAVE_SEARCH_API_KEY" ]]; then
+    openclaw config set tools.web.search.provider "brave" >/dev/null 2>&1
+    openclaw config set tools.web.search.apiKey "${BRAVE_SEARCH_API_KEY}" >/dev/null 2>&1
+fi
+
+log_ok "OpenClaw configured"
