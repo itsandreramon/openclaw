@@ -18,17 +18,43 @@ fi
 # shellcheck source=local/check-hcloud.sh
 source ./local/check-hcloud.sh
 
-# === Server configuration ===
+# === Server name ===
 echo ""
 echo -ne "Server name (default: openclaw): "
 read -r SERVER_NAME
 SERVER_NAME="${SERVER_NAME:-openclaw}"
 
-echo -ne "Server type [cpx11/cpx21/cpx31] (default: cpx21): "
-read -r SERVER_TYPE
-SERVER_TYPE="${SERVER_TYPE:-cpx21}"
+# === Fetch and display server types ===
+log_step "Fetching server types"
+SERVER_TYPES=$(hcloud server-type list -o json | jq -r '.[] | select(.name | startswith("cpx")) | "\(.name)|\(.cores)|\(.memory)|\(.prices[0].price_monthly.gross)"' | sort -t'|' -k4 -n)
+log_ok "Server types loaded"
 
-echo -ne "Location [fsn1/nbg1/hel1/ash/hil] (default: nbg1): "
+echo ""
+echo "Available server types:"
+echo ""
+printf "  %-8s %-8s %-8s %s\n" "TYPE" "CPU" "RAM" "PRICE"
+echo "$SERVER_TYPES" | while IFS='|' read -r name cores mem price; do
+    price_fmt=$(printf "%.0f" "$price")
+    printf "  %-8s %-8s %-8s ~€%s/mo\n" "$name" "${cores}vCPU" "${mem}GB" "$price_fmt"
+done
+echo ""
+echo -ne "Server type (default: cpx11): "
+read -r SERVER_TYPE
+SERVER_TYPE="${SERVER_TYPE:-cpx11}"
+
+# === Fetch and display locations ===
+log_step "Fetching locations"
+LOCATIONS=$(hcloud location list -o json | jq -r '.[] | "\(.name)|\(.city)|\(.country)"')
+log_ok "Locations loaded"
+
+echo ""
+echo "Available locations:"
+echo ""
+echo "$LOCATIONS" | while IFS='|' read -r name city country; do
+    printf "  %-8s %s, %s\n" "$name" "$city" "$country"
+done
+echo ""
+echo -ne "Location (default: nbg1): "
 read -r SERVER_LOCATION
 SERVER_LOCATION="${SERVER_LOCATION:-nbg1}"
 
