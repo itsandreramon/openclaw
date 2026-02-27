@@ -38,9 +38,9 @@ echo "$SERVER_TYPES" | while IFS='|' read -r name cores mem price; do
     printf "  %-8s %-8s %-8s ~€%s/mo\n" "$name" "${cores}vCPU" "${mem}GB" "$price_fmt"
 done
 echo ""
-echo -ne "Server type (default: cpx11): "
+echo -ne "Server type (default: cpx22): "
 read -r SERVER_TYPE
-SERVER_TYPE="${SERVER_TYPE:-cpx11}"
+SERVER_TYPE="${SERVER_TYPE:-cpx22}"
 
 # === Fetch and display locations ===
 log_step "Fetching locations"
