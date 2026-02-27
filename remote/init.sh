@@ -52,3 +52,6 @@ echo "=============================================="
 echo ""
 
 run_step "Firewall" ./setup-firewall.sh
+
+# output tailscale IP for setup.sh to capture
+echo "${TAILSCALE_IP}"

@@ -134,16 +134,17 @@ EOF
 scp -q /tmp/openclaw-env.sh "root@${VPS_HOST}:/tmp/openclaw-env.sh"
 rm /tmp/openclaw-env.sh
 
-ssh "root@${VPS_HOST}" "source /tmp/openclaw-env.sh && chmod +x /tmp/remote/*.sh && /tmp/remote/init.sh"
+# run init and capture tailscale IP from last line (tee shows output while capturing)
+TAILSCALE_IP=$(ssh "root@${VPS_HOST}" "source /tmp/openclaw-env.sh && chmod +x /tmp/remote/*.sh && /tmp/remote/init.sh" | tee /dev/stderr | tail -1)
 
-SSH_EXIT_CODE=$?
+SSH_EXIT_CODE=${PIPESTATUS[0]}
 
 if [[ $SSH_EXIT_CODE -eq 0 ]]; then
     log_ok "Setup complete"
     echo ""
-    echo "Starting OpenClaw setup wizard..."
+    echo "Starting OpenClaw setup wizard via Tailscale (${TAILSCALE_IP})..."
     echo ""
-    ssh -t "root@${VPS_HOST}" "cd /opt/openclaw && ./docker-setup.sh"
+    ssh -t "root@${TAILSCALE_IP}" "cd /opt/openclaw && ./docker-setup.sh"
 else
     log_fail "Setup failed (exit code ${SSH_EXIT_CODE})"
 fi
