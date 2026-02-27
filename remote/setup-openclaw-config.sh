@@ -25,7 +25,6 @@ if [[ -n "$BRAVE_SEARCH_API_KEY" ]]; then
   "tools": {
     "web": {
       "search": {
-        "provider": "brave",
         "apiKey": "'"${BRAVE_SEARCH_API_KEY}"'"
       }
     }
