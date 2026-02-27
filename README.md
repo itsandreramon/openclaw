@@ -57,7 +57,7 @@ The setup wizard runs automatically after provisioning. Use these settings:
 | Gateway port | 18789 |
 | Gateway bind | Loopback (127.0.0.1) |
 | Gateway auth | Password |
-| Tailscale exposure | Off (No Tailscale exposure) |
+| Tailscale exposure | Serve |
 | Enter Telegram bot token | Your bot token from @BotFather |
 | Select a channel | Telegram (Bot API) |
 | Select a channel | Finished |
