@@ -60,6 +60,9 @@ After VPS setup completes, SSH in via Tailscale and start OpenClaw:
 ```bash
 ssh root@<tailscale-ip>
 cd /opt/openclaw
+
+# mount host config into container
+export OPENCLAW_EXTRA_MOUNTS="/root/.openclaw:/home/node/.openclaw:rw"
 ./docker-setup.sh
 ```
 
