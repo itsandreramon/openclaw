@@ -151,8 +151,9 @@ fi
 echo ""
 echo "Server: ${SERVER_NAME} (${SERVER_TYPE}) in ${SERVER_LOCATION}"
 echo ""
-echo -ne "Proceed? (y/N): "
+echo -ne "Proceed? (Y/n): "
 read -r CONFIRM
+CONFIRM="${CONFIRM:-y}"
 [[ ! "$CONFIRM" =~ ^[Yy]$ ]] && log_fail "Aborted"
 
 # === Create server ===
