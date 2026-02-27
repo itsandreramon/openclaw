@@ -12,16 +12,18 @@ Secure OpenClaw deployment on Hetzner with Tailscale and Docker.
 
 ## Environment Variables
 
+Create a `.env` file or enter values when prompted during setup.
+
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `TAILSCALE_AUTH_KEY` | Yes | Auth key from [admin.tailscale.com](https://admin.tailscale.com) |
-| `OPENROUTER_API_KEY` | Yes | API key from [openrouter.ai](https://openrouter.ai) |
+| `TAILSCALE_AUTH_KEY` | Yes | [admin.tailscale.com](https://admin.tailscale.com) → Settings → Keys → Generate auth key |
+| `OPENROUTER_API_KEY` | Yes | [openrouter.ai/keys](https://openrouter.ai/keys) |
+| `TELEGRAM_BOT_TOKEN` | No | [@BotFather](https://t.me/BotFather) → /newbot → copy token |
+| `TELEGRAM_USER_ID` | No | [@userinfobot](https://t.me/userinfobot) → /start → copy ID |
+| `OPENCLAW_MODEL` | No | Default: `openrouter/minimax/minimax-m2.5` |
+| `BRAVE_SEARCH_API_KEY` | No | [brave.com/search/api](https://brave.com/search/api/) → Get API Key |
 | `OPENAI_API_KEY` | No | For Whisper speech-to-text |
 | `ELEVENLABS_API_KEY` | No | For text-to-speech |
-| `TELEGRAM_BOT_TOKEN` | No | Telegram bot token for non-interactive setup |
-| `TELEGRAM_USER_ID` | No | Your Telegram user ID (for allowlist) |
-| `OPENCLAW_MODEL` | No | Model to use (default: `openrouter/minimax/minimax-m2.5`) |
-| `BRAVE_SEARCH_API_KEY` | No | Brave Search API key for web search |
 
 ## Quick Start
 

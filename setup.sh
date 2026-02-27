@@ -126,8 +126,13 @@ else
     read -r BRAVE_SEARCH_API_KEY
 fi
 
-# model defaults to minimax m2.5 if not set
-OPENCLAW_MODEL="${OPENCLAW_MODEL:-openrouter/minimax/minimax-m2.5}"
+if [[ -n "${OPENCLAW_MODEL:-}" ]]; then
+    log_ok "Model from .env (${OPENCLAW_MODEL})"
+else
+    echo -ne "Model (default: openrouter/minimax/minimax-m2.5): "
+    read -r OPENCLAW_MODEL
+    OPENCLAW_MODEL="${OPENCLAW_MODEL:-openrouter/minimax/minimax-m2.5}"
+fi
 
 # === Confirmation ===
 echo ""
