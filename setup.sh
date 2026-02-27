@@ -3,20 +3,10 @@
 # Run this on your Mac to provision a fresh Hetzner VPS and configure OpenClaw
 set -euo pipefail
 
-# === Colors ===
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-CYAN='\033[0;36m'
-NC='\033[0m'
-
-log_step() { echo -e "\n${CYAN}[LOCAL]${NC} $1"; }
-log_ok() { echo -e "${GREEN}[OK]${NC} $1"; }
-log_fail() { echo -e "${RED}[FAIL]${NC} $1"; exit 1; }
-log_warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
-
-# === Get script directory ===
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# shellcheck source=local/common.sh
+source "${SCRIPT_DIR}/local/common.sh"
 
 # === Load .env file if present ===
 if [[ -f "${SCRIPT_DIR}/.env" ]]; then
@@ -32,19 +22,9 @@ echo -e "${CYAN}OpenClaw VPS Setup${NC}"
 echo "=============================================="
 echo ""
 
-# === Check for hcloud CLI ===
-if ! command -v hcloud &>/dev/null; then
-    log_fail "hcloud CLI not found. Install with: brew install hcloud"
-fi
-
-# === Check hcloud context ===
-log_step "Checking Hetzner CLI authentication..."
-if ! hcloud context active &>/dev/null; then
-    log_warn "No active hcloud context. Run: hcloud context create <name>"
-    log_fail "hcloud not authenticated"
-fi
-HCLOUD_CONTEXT=$(hcloud context active)
-log_ok "Using hcloud context: ${HCLOUD_CONTEXT}"
+# === Check hcloud ===
+# shellcheck source=local/check-hcloud.sh
+source "${SCRIPT_DIR}/local/check-hcloud.sh"
 
 # === Server configuration ===
 echo ""
@@ -77,38 +57,7 @@ read -r SERVER_LOCATION
 SERVER_LOCATION="${SERVER_LOCATION:-nbg1}"
 
 # === SSH Key ===
-log_step "SSH Key Configuration"
-
-# find local ssh public key
-LOCAL_SSH_KEY=""
-for keyfile in ~/.ssh/id_ed25519.pub ~/.ssh/id_rsa.pub; do
-    if [[ -f "$keyfile" ]]; then
-        LOCAL_SSH_KEY="$keyfile"
-        break
-    fi
-done
-
-if [[ -z "$LOCAL_SSH_KEY" ]]; then
-    log_fail "No SSH public key found in ~/.ssh/. Generate one with: ssh-keygen -t ed25519"
-fi
-log_ok "Found local SSH key: ${LOCAL_SSH_KEY}"
-
-# compute fingerprint of local key (hetzner uses md5 hex format)
-LOCAL_FINGERPRINT=$(ssh-keygen -E md5 -lf "${LOCAL_SSH_KEY}" | awk '{print $2}' | sed 's/^MD5://')
-
-# check if this key already exists in hetzner by fingerprint
-EXISTING_KEY=$(hcloud ssh-key list -o json | jq -r ".[] | select(.fingerprint == \"${LOCAL_FINGERPRINT}\") | .name" | head -1)
-
-if [[ -n "$EXISTING_KEY" ]]; then
-    SSH_KEY_NAME="$EXISTING_KEY"
-    log_ok "SSH key already exists in Hetzner as '${SSH_KEY_NAME}'"
-else
-    # upload with hostname-based name
-    SSH_KEY_NAME="$(hostname)-openclaw"
-    log_step "Uploading SSH key to Hetzner as '${SSH_KEY_NAME}'..."
-    hcloud ssh-key create --name "${SSH_KEY_NAME}" --public-key-from-file "${LOCAL_SSH_KEY}" || log_fail "Failed to upload SSH key"
-    log_ok "SSH key uploaded"
-fi
+SSH_KEY_NAME=$("${SCRIPT_DIR}/local/setup-ssh-key.sh" | tail -1)
 
 # === Gather API keys ===
 echo ""
@@ -178,75 +127,29 @@ read -r CONFIRM
 [[ ! "$CONFIRM" =~ ^[Yy]$ ]] && log_fail "Aborted by user"
 
 # === Create server ===
-log_step "Creating Hetzner server '${SERVER_NAME}'..."
-
-# check if server already exists
-if hcloud server describe "${SERVER_NAME}" &>/dev/null; then
-    log_warn "Server '${SERVER_NAME}' already exists"
-    echo -ne "${YELLOW}[INPUT]${NC} Delete and recreate? (y/N): "
-    read -r DELETE_CONFIRM
-    if [[ "$DELETE_CONFIRM" =~ ^[Yy]$ ]]; then
-        log_step "Deleting existing server..."
-        hcloud server delete "${SERVER_NAME}" || log_fail "Failed to delete server"
-        log_ok "Server deleted"
-        sleep 2
-    else
-        log_fail "Server already exists. Use a different name or delete manually."
-    fi
-fi
-
-# create the server
-hcloud server create \
-    --name "${SERVER_NAME}" \
-    --type "${SERVER_TYPE}" \
-    --location "${SERVER_LOCATION}" \
-    --image ubuntu-24.04 \
-    --ssh-key "${SSH_KEY_NAME}" \
-    || log_fail "Failed to create server"
-
-log_ok "Server created"
-
-# get server IP
-VPS_HOST=$(hcloud server ip "${SERVER_NAME}")
-log_ok "Server IP: ${VPS_HOST}"
+VPS_HOST=$("${SCRIPT_DIR}/local/create-server.sh" "${SERVER_NAME}" "${SERVER_TYPE}" "${SERVER_LOCATION}" "${SSH_KEY_NAME}" | tail -1)
 
 # === Wait for SSH ===
-log_step "Waiting for server to become accessible..."
-MAX_ATTEMPTS=30
-ATTEMPT=0
-while [[ $ATTEMPT -lt $MAX_ATTEMPTS ]]; do
-    if ssh -o ConnectTimeout=5 -o BatchMode=yes -o StrictHostKeyChecking=accept-new "root@${VPS_HOST}" "echo 'SSH OK'" &>/dev/null; then
-        break
-    fi
-    ATTEMPT=$((ATTEMPT + 1))
-    echo -n "."
-    sleep 5
-done
-echo ""
-
-if [[ $ATTEMPT -ge $MAX_ATTEMPTS ]]; then
-    log_fail "Server not accessible after ${MAX_ATTEMPTS} attempts"
-fi
-log_ok "SSH connection established"
+"${SCRIPT_DIR}/local/wait-for-ssh.sh" "${VPS_HOST}"
 
 # === Upload and run setup script ===
-log_step "Uploading cloud-init script to VPS..."
-scp -o StrictHostKeyChecking=accept-new "${SCRIPT_DIR}/cloud-init.sh" "root@${VPS_HOST}:/tmp/cloud-init.sh" || log_fail "Failed to upload script"
-log_ok "Script uploaded"
+log_step "Uploading remote scripts to VPS..."
+scp -o StrictHostKeyChecking=accept-new -r "${SCRIPT_DIR}/remote" "root@${VPS_HOST}:/tmp/" || log_fail "Failed to upload scripts"
+log_ok "Scripts uploaded"
 
 log_step "Running setup on VPS (this may take a few minutes)..."
 echo "=============================================="
 echo ""
 
-# run the script with environment variables set
+# run the init script with environment variables
 ssh -t "root@${VPS_HOST}" "
     export TAILSCALE_AUTH_KEY='${TAILSCALE_AUTH_KEY}'
     export OPENROUTER_API_KEY='${OPENROUTER_API_KEY}'
     export MACBOOK_TAILSCALE_IP='${MACBOOK_TAILSCALE_IP}'
     export OPENAI_API_KEY='${OPENAI_API_KEY:-}'
     export ELEVENLABS_API_KEY='${ELEVENLABS_API_KEY:-}'
-    chmod +x /tmp/cloud-init.sh
-    /tmp/cloud-init.sh
+    chmod +x /tmp/remote/*.sh
+    /tmp/remote/init.sh
 "
 
 SSH_EXIT_CODE=$?

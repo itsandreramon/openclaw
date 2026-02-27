@@ -34,9 +34,9 @@ The setup script will:
 1. Upload your SSH key to Hetzner (if not already present)
 2. Prompt for API keys (or load from `.env`)
 3. Auto-detect your Mac's Tailscale IP
-4. Create the VPS and run `cloud-init.sh`
+4. Create the VPS and run remote init scripts
 
-The cloud-init script provisions:
+The remote init provisions:
 - 4GB swap
 - Tailscale VPN with SSH
 - Node.js 22 + browser dependencies
@@ -44,6 +44,29 @@ The cloud-init script provisions:
 - UFW firewall (SSH restricted to your Mac's Tailscale IP)
 - Systemd service (enabled, not started)
 - Auto-update cron (daily 3am UTC)
+
+## Project Structure
+
+```
+├── setup.sh              # main entry point (run on mac)
+├── local/                # scripts that run on your mac
+│   ├── common.sh         # shared utilities
+│   ├── check-hcloud.sh   # verify hcloud cli
+│   ├── setup-ssh-key.sh  # upload ssh key to hetzner
+│   ├── create-server.sh  # create hetzner server
+│   └── wait-for-ssh.sh   # wait for server to be accessible
+└── remote/               # scripts that run on the vps
+    ├── common.sh         # shared utilities
+    ├── init.sh           # main init script
+    ├── setup-swap.sh     # configure swap
+    ├── setup-tailscale.sh# install tailscale
+    ├── setup-node.sh     # install node.js + browser deps
+    ├── setup-firewall.sh # configure ufw
+    ├── setup-openclaw.sh # install openclaw
+    ├── setup-env.sh      # create environment file
+    ├── setup-systemd.sh  # create systemd service
+    └── setup-cron.sh     # setup auto-update cron
+```
 
 ## Configure (Manual)
 
