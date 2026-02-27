@@ -6,7 +6,7 @@ Automated OpenClaw deployment on Hetzner with Tailscale and Docker.
 
 - macOS with Homebrew
 - Hetzner account
-- Tailscale account
+- Tailscale account with HTTPS enabled ([login.tailscale.com/admin/dns](https://login.tailscale.com/admin/dns) → Enable HTTPS)
 
 ## Environment Variables
 
