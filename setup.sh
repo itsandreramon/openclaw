@@ -104,6 +104,31 @@ else
     read -r ELEVENLABS_API_KEY
 fi
 
+# === Telegram config (optional) ===
+if [[ -n "${TELEGRAM_BOT_TOKEN:-}" ]]; then
+    log_ok "Telegram bot token from .env"
+else
+    echo -ne "Telegram bot token (optional): "
+    read -r TELEGRAM_BOT_TOKEN
+fi
+
+if [[ -n "${TELEGRAM_USER_ID:-}" ]]; then
+    log_ok "Telegram user ID from .env"
+else
+    echo -ne "Telegram user ID (optional): "
+    read -r TELEGRAM_USER_ID
+fi
+
+if [[ -n "${BRAVE_SEARCH_API_KEY:-}" ]]; then
+    log_ok "Brave Search key from .env"
+else
+    echo -ne "Brave Search API key (optional): "
+    read -r BRAVE_SEARCH_API_KEY
+fi
+
+# model defaults to minimax if not set
+OPENCLAW_MODEL="${OPENCLAW_MODEL:-openrouter/minimax/MiniMax-M1}"
+
 # === Confirmation ===
 echo ""
 echo "Server: ${SERVER_NAME} (${SERVER_TYPE}) in ${SERVER_LOCATION}"
@@ -127,6 +152,10 @@ ssh "root@${VPS_HOST}" bash -c "'
     export MACBOOK_TAILSCALE_IP=\"${MACBOOK_TAILSCALE_IP}\"
     export OPENAI_API_KEY=\"${OPENAI_API_KEY:-}\"
     export ELEVENLABS_API_KEY=\"${ELEVENLABS_API_KEY:-}\"
+    export TELEGRAM_BOT_TOKEN=\"${TELEGRAM_BOT_TOKEN:-}\"
+    export TELEGRAM_USER_ID=\"${TELEGRAM_USER_ID:-}\"
+    export BRAVE_SEARCH_API_KEY=\"${BRAVE_SEARCH_API_KEY:-}\"
+    export OPENCLAW_MODEL=\"${OPENCLAW_MODEL}\"
     chmod +x /tmp/remote/*.sh
     /tmp/remote/init.sh
 '"

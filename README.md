@@ -18,6 +18,10 @@ Secure OpenClaw deployment on Hetzner with Tailscale and Docker.
 | `OPENROUTER_API_KEY` | Yes | API key from [openrouter.ai](https://openrouter.ai) |
 | `OPENAI_API_KEY` | No | For Whisper speech-to-text |
 | `ELEVENLABS_API_KEY` | No | For text-to-speech |
+| `TELEGRAM_BOT_TOKEN` | No | Telegram bot token for non-interactive setup |
+| `TELEGRAM_USER_ID` | No | Your Telegram user ID (for allowlist) |
+| `OPENCLAW_MODEL` | No | Model to use (default: `openrouter/minimax/MiniMax-M1`) |
+| `BRAVE_SEARCH_API_KEY` | No | Brave Search API key for web search |
 
 ## Quick Start
 
@@ -42,6 +46,7 @@ The remote init provisions:
 - Tailscale VPN with SSH
 - Docker + Docker Compose
 - OpenClaw repository clone
+- OpenClaw config (if Telegram token provided)
 - UFW firewall (SSH restricted to your Mac's Tailscale IP)
 - Auto-update cron (daily 3am UTC)
 
@@ -62,6 +67,7 @@ The remote init provisions:
     ├── setup-tailscale.sh# install tailscale
     ├── setup-firewall.sh # configure ufw
     ├── setup-openclaw.sh # install docker + clone repo
+    ├── setup-openclaw-config.sh # create openclaw.json
     ├── setup-env.sh      # create environment file
     └── setup-cron.sh     # setup auto-update cron
 ```

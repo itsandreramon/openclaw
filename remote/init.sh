@@ -14,6 +14,7 @@ export TAILSCALE_IP
 
 ./setup-openclaw.sh
 ./setup-env.sh
+./setup-openclaw-config.sh
 ./setup-cron.sh
 
 # summary before firewall cuts public SSH
