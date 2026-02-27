@@ -2,9 +2,9 @@
 # install and configure tailscale
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$(dirname "${BASH_SOURCE[0]}")"
 # shellcheck source=common.sh
-source "${SCRIPT_DIR}/common.sh"
+source ./common.sh
 
 TAILSCALE_AUTH_KEY="${TAILSCALE_AUTH_KEY:?TAILSCALE_AUTH_KEY required}"
 

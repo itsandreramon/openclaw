@@ -1,6 +1,6 @@
 # OpenClaw VPS Deployment
 
-Minimal, secure OpenClaw deployment with Tailscale. Native installation (no Docker) with full browser support.
+Secure OpenClaw deployment on Hetzner with Tailscale and Docker.
 
 ## Prerequisites
 
@@ -39,10 +39,9 @@ The setup script will:
 The remote init provisions:
 - 4GB swap
 - Tailscale VPN with SSH
-- Node.js 22 + browser dependencies
-- OpenClaw + Puppeteer (with Chrome)
+- Docker + Docker Compose
+- OpenClaw repository clone
 - UFW firewall (SSH restricted to your Mac's Tailscale IP)
-- Systemd service (enabled, not started)
 - Auto-update cron (daily 3am UTC)
 
 ## Project Structure
@@ -60,94 +59,49 @@ The remote init provisions:
     ├── init.sh           # main init script
     ├── setup-swap.sh     # configure swap
     ├── setup-tailscale.sh# install tailscale
-    ├── setup-node.sh     # install node.js + browser deps
     ├── setup-firewall.sh # configure ufw
-    ├── setup-openclaw.sh # install openclaw
+    ├── setup-openclaw.sh # install docker + clone repo
     ├── setup-env.sh      # create environment file
-    ├── setup-systemd.sh  # create systemd service
     └── setup-cron.sh     # setup auto-update cron
 ```
 
-## Configure (Manual)
+## Configure
 
-After provisioning, SSH in and run the onboarding wizard:
+After provisioning, SSH in and run the Docker setup:
 
 ```bash
 ssh root@<vps-tailscale-ip>
-openclaw onboard
+cd /opt/openclaw
+
+# setup with persistence and system packages
+export OPENCLAW_HOME_VOLUME="openclaw_home"
+export OPENCLAW_DOCKER_APT_PACKAGES="git curl jq"
+./docker-setup.sh
+
+# install browser for web automation
+docker compose run --rm openclaw-cli \
+  node /app/node_modules/playwright-core/cli.js install chromium
 ```
 
-When prompted:
-- **Gateway bind**: `lan`
-- **Gateway auth**: `token`
-- **Gateway token**: press Enter (auto-generated)
-- **Tailscale exposure**: `Off`
-- **Install Gateway daemon**: `No`
-- **Model provider**: `openrouter`
+- `OPENCLAW_HOME_VOLUME` persists `/home/node` (agent sessions, browser cache) across rebuilds
+- `OPENCLAW_DOCKER_APT_PACKAGES` bakes system packages into the image
 
-Start the gateway:
-
-```bash
-systemctl start openclaw
-```
+Follow the onboarding wizard prompts.
 
 ## Access
-
-Get your gateway token:
-
-```bash
-cat /root/.openclaw/openclaw.json | jq -r '.gateway.token'
-```
 
 Access dashboard:
 - Direct: `http://<vps-tailscale-ip>:18789`
 - Via tunnel: `ssh -L 18789:localhost:18789 root@<vps-tailscale-ip>` then `http://localhost:18789`
 
-## Optional: Add Telegram
-
-```bash
-openclaw channels add --channel telegram --token "<BOT_TOKEN>"
-systemctl restart openclaw
-```
-
-## Optional: Add Whisper STT
-
-```bash
-jq '.tools.media.audio = {
-  "enabled": true,
-  "maxBytes": 20971520,
-  "models": [{"provider": "openai", "model": "gpt-4o-mini-transcribe"}]
-}' /root/.openclaw/openclaw.json > /tmp/oc.json && mv /tmp/oc.json /root/.openclaw/openclaw.json
-systemctl restart openclaw
-```
-
-## Optional: Add TTS
-
-```bash
-jq '. + {
-  "messages": {
-    "tts": {
-      "auto": "tagged",
-      "provider": "elevenlabs",
-      "elevenlabs": {
-        "apiKey": "YOUR_ELEVENLABS_API_KEY",
-        "modelId": "eleven_multilingual_v2",
-        "voiceId": "CwhRBWXzGAHq8TQ4Fs17"
-      }
-    }
-  }
-}' /root/.openclaw/openclaw.json > /tmp/oc.json && mv /tmp/oc.json /root/.openclaw/openclaw.json
-systemctl restart openclaw
-```
-
-Voices: `CwhRBWXzGAHq8TQ4Fs17` (Roger), `onwK4e9ZLuTAKqWW03F9` (Daniel), `pNInz6obpgDQGcFmaJgB` (Adam)
-
 ## Managing
 
 ```bash
-systemctl status openclaw      # status
-journalctl -u openclaw -f      # logs
-systemctl restart openclaw     # restart
+cd /opt/openclaw
+docker compose ps                    # status
+docker compose logs -f               # logs
+docker compose restart               # restart
+docker compose down && docker compose up -d  # full restart
 ```
 
 ## Updates
@@ -156,7 +110,10 @@ Automatic nightly updates at 3am UTC. Logs: `/var/log/openclaw-update.log`
 
 Manual update:
 ```bash
-/usr/local/bin/openclaw-update.sh
+cd /opt/openclaw
+git pull
+docker build -t openclaw:local -f Dockerfile .
+docker compose up -d openclaw-gateway
 ```
 
 ## Security

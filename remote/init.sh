@@ -3,23 +3,23 @@
 # Runs on the VPS to set up all components
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$(dirname "${BASH_SOURCE[0]}")"
 
 # shellcheck source=common.sh
-source "${SCRIPT_DIR}/common.sh"
+source ./common.sh
 
 # run each setup phase
-"${SCRIPT_DIR}/setup-swap.sh"
+./setup-swap.sh
 
-TAILSCALE_IP=$("${SCRIPT_DIR}/setup-tailscale.sh" | tail -1)
+TAILSCALE_IP=$(./setup-tailscale.sh | tail -1)
 export TAILSCALE_IP
 
-"${SCRIPT_DIR}/setup-node.sh"
-"${SCRIPT_DIR}/setup-firewall.sh"
-"${SCRIPT_DIR}/setup-openclaw.sh"
-"${SCRIPT_DIR}/setup-env.sh"
-"${SCRIPT_DIR}/setup-systemd.sh"
-"${SCRIPT_DIR}/setup-cron.sh"
+./setup-openclaw.sh
+./setup-env.sh
+./setup-cron.sh
+
+# firewall last - locks out public SSH
+./setup-firewall.sh
 
 # === Summary ===
 echo ""
@@ -33,24 +33,18 @@ echo "NEXT STEPS:"
 echo "1. SSH into the VPS:"
 echo "   ssh root@${TAILSCALE_IP}"
 echo ""
-echo "2. Run OpenClaw onboarding wizard:"
-echo "   openclaw onboard"
+echo "2. Run OpenClaw Docker setup:"
+echo "   cd /opt/openclaw"
+echo "   export OPENCLAW_HOME_VOLUME=\"openclaw_home\""
+echo "   export OPENCLAW_DOCKER_APT_PACKAGES=\"git curl jq\""
+echo "   ./docker-setup.sh"
 echo ""
-echo "3. When prompted, use these settings:"
-echo "   - Gateway bind: lan"
-echo "   - Gateway auth: token"
-echo "   - Gateway token: (press Enter for auto-generated)"
-echo "   - Tailscale exposure: Off"
-echo "   - Install Gateway daemon: No"
-echo "   - Model provider: openrouter"
+echo "3. Install Playwright browser:"
+echo "   docker compose run --rm openclaw-cli node /app/node_modules/playwright-core/cli.js install chromium"
 echo ""
-echo "4. Start the gateway:"
-echo "   systemctl start openclaw"
+echo "4. Follow the onboarding wizard prompts"
 echo ""
-echo "5. Get your gateway token:"
-echo "   cat /root/.openclaw/openclaw.json | jq -r '.gateway.token'"
-echo ""
-echo "6. Access dashboard:"
+echo "5. Access dashboard:"
 echo "   http://${TAILSCALE_IP}:18789"
 echo "   (or via tunnel: ssh -L 18789:localhost:18789 root@${TAILSCALE_IP})"
 echo ""

@@ -2,9 +2,11 @@
 # check hcloud cli is installed and authenticated
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+_ORIG_DIR="$PWD"
+cd "$(dirname "${BASH_SOURCE[0]}")"
 # shellcheck source=common.sh
-source "${SCRIPT_DIR}/common.sh"
+source ./common.sh
+cd "$_ORIG_DIR"
 
 if ! command -v hcloud &>/dev/null; then
     log_fail "hcloud CLI not found. Install with: brew install hcloud"

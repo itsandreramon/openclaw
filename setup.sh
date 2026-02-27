@@ -3,16 +3,16 @@
 # Run this on your Mac to provision a fresh Hetzner VPS and configure OpenClaw
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$(dirname "${BASH_SOURCE[0]}")"
 
 # shellcheck source=local/common.sh
-source "${SCRIPT_DIR}/local/common.sh"
+source ./local/common.sh
 
 # === Load .env file if present ===
-if [[ -f "${SCRIPT_DIR}/.env" ]]; then
+if [[ -f ./.env ]]; then
     set -a
     # shellcheck source=/dev/null
-    source "${SCRIPT_DIR}/.env"
+    source ./.env
     set +a
 fi
 
@@ -24,7 +24,7 @@ echo ""
 
 # === Check hcloud ===
 # shellcheck source=local/check-hcloud.sh
-source "${SCRIPT_DIR}/local/check-hcloud.sh"
+source ./local/check-hcloud.sh
 
 # === Server configuration ===
 echo ""
@@ -57,7 +57,7 @@ read -r SERVER_LOCATION
 SERVER_LOCATION="${SERVER_LOCATION:-nbg1}"
 
 # === SSH Key ===
-SSH_KEY_NAME=$("${SCRIPT_DIR}/local/setup-ssh-key.sh" | tail -1)
+SSH_KEY_NAME=$(./local/setup-ssh-key.sh | tail -1)
 
 # === Gather API keys ===
 echo ""
@@ -127,14 +127,14 @@ read -r CONFIRM
 [[ ! "$CONFIRM" =~ ^[Yy]$ ]] && log_fail "Aborted by user"
 
 # === Create server ===
-VPS_HOST=$("${SCRIPT_DIR}/local/create-server.sh" "${SERVER_NAME}" "${SERVER_TYPE}" "${SERVER_LOCATION}" "${SSH_KEY_NAME}" | tail -1)
+VPS_HOST=$(./local/create-server.sh "${SERVER_NAME}" "${SERVER_TYPE}" "${SERVER_LOCATION}" "${SSH_KEY_NAME}" | tail -1)
 
 # === Wait for SSH ===
-"${SCRIPT_DIR}/local/wait-for-ssh.sh" "${VPS_HOST}"
+./local/wait-for-ssh.sh "${VPS_HOST}"
 
 # === Upload and run setup script ===
 log_step "Uploading remote scripts to VPS..."
-scp -o StrictHostKeyChecking=accept-new -r "${SCRIPT_DIR}/remote" "root@${VPS_HOST}:/tmp/" || log_fail "Failed to upload scripts"
+scp -o StrictHostKeyChecking=accept-new -r ./remote "root@${VPS_HOST}:/tmp/" || log_fail "Failed to upload scripts"
 log_ok "Scripts uploaded"
 
 log_step "Running setup on VPS (this may take a few minutes)..."

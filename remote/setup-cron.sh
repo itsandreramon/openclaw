@@ -2,17 +2,21 @@
 # setup auto-update cron job
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$(dirname "${BASH_SOURCE[0]}")"
 # shellcheck source=common.sh
-source "${SCRIPT_DIR}/common.sh"
+source ./common.sh
 
 log_step "Creating auto-update script..."
 cat > /usr/local/bin/openclaw-update.sh << 'EOF'
 #!/bin/bash
 set -euo pipefail
 LOG="/var/log/openclaw-update.log"
+
 echo "[$(date -Iseconds)] Starting update" >> "$LOG"
-openclaw update --channel stable >> "$LOG" 2>&1 && systemctl restart openclaw
+cd /opt/openclaw
+git pull >> "$LOG" 2>&1
+docker build -t openclaw:local -f Dockerfile . >> "$LOG" 2>&1
+docker compose up -d openclaw-gateway >> "$LOG" 2>&1
 echo "[$(date -Iseconds)] Update complete" >> "$LOG"
 EOF
 chmod +x /usr/local/bin/openclaw-update.sh

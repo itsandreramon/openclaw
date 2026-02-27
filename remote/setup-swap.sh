@@ -2,9 +2,9 @@
 # setup 4gb swap
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$(dirname "${BASH_SOURCE[0]}")"
 # shellcheck source=common.sh
-source "${SCRIPT_DIR}/common.sh"
+source ./common.sh
 
 log_step "Setting up 4GB swap..."
 if [[ ! -f /swapfile ]]; then

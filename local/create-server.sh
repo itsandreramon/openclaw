@@ -2,9 +2,9 @@
 # create hetzner server
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$(dirname "${BASH_SOURCE[0]}")"
 # shellcheck source=common.sh
-source "${SCRIPT_DIR}/common.sh"
+source ./common.sh
 
 SERVER_NAME="${1:?Server name required}"
 SERVER_TYPE="${2:?Server type required}"
@@ -13,19 +13,12 @@ SSH_KEY_NAME="${4:?SSH key name required}"
 
 log_step "Creating Hetzner server '${SERVER_NAME}'..."
 
-# check if server exists
+# delete if server exists
 if hcloud server describe "${SERVER_NAME}" &>/dev/null; then
-    log_warn "Server '${SERVER_NAME}' already exists"
-    echo -ne "${YELLOW}[INPUT]${NC} Delete and recreate? (y/N): "
-    read -r DELETE_CONFIRM
-    if [[ "$DELETE_CONFIRM" =~ ^[Yy]$ ]]; then
-        log_step "Deleting existing server..."
-        hcloud server delete "${SERVER_NAME}" || log_fail "Failed to delete server"
-        log_ok "Server deleted"
-        sleep 2
-    else
-        log_fail "Server already exists. Use a different name or delete manually."
-    fi
+    log_warn "Server '${SERVER_NAME}' already exists, deleting..."
+    hcloud server delete "${SERVER_NAME}" || log_fail "Failed to delete server"
+    log_ok "Server deleted"
+    sleep 2
 fi
 
 hcloud server create \

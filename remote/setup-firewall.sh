@@ -2,9 +2,9 @@
 # configure ufw firewall
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$(dirname "${BASH_SOURCE[0]}")"
 # shellcheck source=common.sh
-source "${SCRIPT_DIR}/common.sh"
+source ./common.sh
 
 MACBOOK_TAILSCALE_IP="${MACBOOK_TAILSCALE_IP:?MACBOOK_TAILSCALE_IP required}"
 

@@ -2,9 +2,9 @@
 # wait for server ssh to become available
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$(dirname "${BASH_SOURCE[0]}")"
 # shellcheck source=common.sh
-source "${SCRIPT_DIR}/common.sh"
+source ./common.sh
 
 VPS_HOST="${1:?VPS host required}"
 MAX_ATTEMPTS="${2:-30}"

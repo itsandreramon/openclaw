@@ -1,31 +1,33 @@
 #!/bin/bash
-# install openclaw and puppeteer
+# install docker and clone openclaw
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$(dirname "${BASH_SOURCE[0]}")"
 # shellcheck source=common.sh
-source "${SCRIPT_DIR}/common.sh"
+source ./common.sh
 
-log_step "Installing OpenClaw..."
-npm install -g openclaw@latest puppeteer >/dev/null 2>&1 || log_fail "OpenClaw install failed"
-OPENCLAW_VERSION=$(openclaw --version 2>/dev/null || echo "unknown")
-log_ok "OpenClaw ${OPENCLAW_VERSION} installed"
+log_step "Installing Docker..."
+if ! command -v docker &>/dev/null; then
+    apt-get update -qq >/dev/null 2>&1
+    apt-get install -y -qq ca-certificates curl git >/dev/null 2>&1
+    curl -fsSL https://get.docker.com | sh >/dev/null 2>&1 || log_fail "Docker install failed"
+fi
+DOCKER_VERSION=$(docker --version 2>/dev/null)
+log_ok "Docker installed: ${DOCKER_VERSION}"
 
-log_step "Creating OpenClaw directories..."
-mkdir -p /root/.openclaw/{workspace,identity,skills}
-log_ok "Directories created"
+log_step "Verifying Docker Compose..."
+docker compose version >/dev/null 2>&1 || log_fail "Docker Compose not available"
+log_ok "Docker Compose available"
 
-log_step "Creating base config..."
-CHROME_PATH=$(find /root/.cache/puppeteer -name "chrome" -type f 2>/dev/null | head -1 || true)
-cat > /root/.openclaw/openclaw.json << EOF
-{
-  "browser": {
-    "enabled": true,
-    "evaluateEnabled": true,
-    "headless": false,
-    "noSandbox": true,
-    "executablePath": "${CHROME_PATH:-}"
-  }
-}
-EOF
-log_ok "Base config created"
+log_step "Cloning OpenClaw repository..."
+if [[ -d /opt/openclaw ]]; then
+    cd /opt/openclaw && git pull >/dev/null 2>&1
+else
+    git clone https://github.com/openclaw/openclaw.git /opt/openclaw >/dev/null 2>&1 || log_fail "Git clone failed"
+fi
+log_ok "Repository ready at /opt/openclaw"
+
+log_step "Setting up permissions..."
+mkdir -p /root/.openclaw/{workspace,credentials}
+chown -R 1000:1000 /root/.openclaw
+log_ok "Permissions configured (UID 1000 for node user)"
