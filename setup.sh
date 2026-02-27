@@ -145,6 +145,17 @@ if [[ $SSH_EXIT_CODE -eq 0 ]]; then
     echo "Starting OpenClaw setup wizard via Tailscale (${TAILSCALE_IP})..."
     echo ""
     ssh -t "root@${TAILSCALE_IP}" "cd /opt/openclaw && ./docker-setup.sh"
+
+    # print dashboard URL after setup completes
+    echo ""
+    echo "=============================================="
+    TAILSCALE_HOSTNAME=$(ssh "root@${TAILSCALE_IP}" "tailscale status --json | jq -r '.Self.DNSName' | sed 's/\.$//'" 2>/dev/null)
+    if [[ -n "${TAILSCALE_HOSTNAME}" ]]; then
+        log_ok "Dashboard: https://${TAILSCALE_HOSTNAME}"
+    else
+        log_ok "Dashboard: https://<hostname>.<tailnet>.ts.net"
+    fi
+    echo "=============================================="
 else
     log_fail "Setup failed (exit code ${SSH_EXIT_CODE})"
 fi
