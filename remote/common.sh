@@ -10,3 +10,6 @@ log_step() { echo -e "\n${YELLOW}[STEP]${NC} $1"; }
 log_ok() { echo -e "${GREEN}[OK]${NC} $1"; }
 log_fail() { echo -e "${RED}[FAIL]${NC} $1"; exit 1; }
 log_warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
+
+# trap errors and show which command failed
+trap 'echo -e "${RED}[ERROR]${NC} Command failed at line $LINENO: $BASH_COMMAND"' ERR

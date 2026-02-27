@@ -22,8 +22,9 @@ log_step "Configuring OpenClaw"
 # initialize config
 openclaw setup >/dev/null 2>&1 || true
 
-# set model
+# set model with free fallback (llama 3.3 70b supports tool use)
 openclaw config set agents.defaults.model.primary "${OPENCLAW_MODEL}" >/dev/null 2>&1
+openclaw config set agents.defaults.model.fallbacks "[\"meta-llama/llama-3.3-70b-instruct:free\"]" >/dev/null 2>&1
 
 # configure telegram
 openclaw config set channels.telegram.enabled true >/dev/null 2>&1
