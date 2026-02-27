@@ -26,7 +26,7 @@ SERVER_NAME="${SERVER_NAME:-openclaw}"
 
 # === Fetch and display server types ===
 log_step "Fetching server types"
-SERVER_TYPES=$(hcloud server-type list -o json | jq -r '.[] | select(.name | startswith("cpx")) | "\(.name)|\(.cores)|\(.memory)|\(.prices[0].price_monthly.gross)"' | sort -t'|' -k4 -n)
+SERVER_TYPES=$(hcloud server-type list -o json | jq -r '.[] | select(.name | test("^(cpx|cx)")) | "\(.name)|\(.cores)|\(.memory)|\(.prices[0].price_monthly.gross)"' | sort -t'|' -k4 -n)
 log_ok "Server types loaded"
 
 echo ""
@@ -38,9 +38,9 @@ echo "$SERVER_TYPES" | while IFS='|' read -r name cores mem price; do
     printf "  %-8s %-8s %-8s ~€%s/mo\n" "$name" "${cores}vCPU" "${mem}GB" "$price_fmt"
 done
 echo ""
-echo -ne "Server type (default: cpx22): "
+echo -ne "Server type (default: cx23): "
 read -r SERVER_TYPE
-SERVER_TYPE="${SERVER_TYPE:-cpx22}"
+SERVER_TYPE="${SERVER_TYPE:-cx23}"
 
 # === Fetch and display locations ===
 log_step "Fetching locations"
