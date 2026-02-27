@@ -19,23 +19,6 @@ Create a `.env` file or enter values when prompted.
 | `OPENAI_API_KEY` | No | [platform.openai.com/api-keys](https://platform.openai.com/api-keys) |
 | `ELEVENLABS_API_KEY` | No | [elevenlabs.io/app/settings/api-keys](https://elevenlabs.io/app/settings/api-keys) |
 
-## Quick Start
-
-```bash
-# install hetzner cli
-brew install hcloud
-hcloud context create openclaw
-
-# run setup
-./setup.sh
-```
-
-The setup will:
-1. Fetch server types/locations from Hetzner API
-2. Prompt for configuration (or load from `.env`)
-3. Create VPS (default: cx23 ~€3.50/mo)
-4. Run remote provisioning with progress [1/7]...[7/7]
-
 ## What Gets Installed
 
 | Step | Description |
