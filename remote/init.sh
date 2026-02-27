@@ -45,7 +45,8 @@ run_step "Auto-updates" ./setup-cron.sh
 CURRENT_STEP=$((CURRENT_STEP + 1))
 echo -e "\n${YELLOW}[${CURRENT_STEP}/${TOTAL_STEPS}]${NC} Docker setup (this may take a few minutes)"
 cd /opt/openclaw
-if ./docker-setup.sh </dev/null >/dev/null 2>&1; then
+# build and start without interactive onboarding (config already created)
+if docker compose build --quiet && docker compose up -d openclaw-gateway >/dev/null 2>&1; then
     echo -e "${GREEN}[OK]${NC} Docker setup"
 else
     echo -e "${RED}[FAIL]${NC} Docker setup"
