@@ -121,15 +121,15 @@ VPS_HOST=$(./local/create-server.sh "${SERVER_NAME}" "${SERVER_TYPE}" "${SERVER_
 # === Run remote setup ===
 scp -q -o StrictHostKeyChecking=accept-new -r ./remote "root@${VPS_HOST}:/tmp/" || log_fail "Failed to upload scripts"
 
-ssh "root@${VPS_HOST}" "
-    export TAILSCALE_AUTH_KEY='${TAILSCALE_AUTH_KEY}'
-    export OPENROUTER_API_KEY='${OPENROUTER_API_KEY}'
-    export MACBOOK_TAILSCALE_IP='${MACBOOK_TAILSCALE_IP}'
-    export OPENAI_API_KEY='${OPENAI_API_KEY:-}'
-    export ELEVENLABS_API_KEY='${ELEVENLABS_API_KEY:-}'
+ssh "root@${VPS_HOST}" bash -c "'
+    export TAILSCALE_AUTH_KEY=\"${TAILSCALE_AUTH_KEY}\"
+    export OPENROUTER_API_KEY=\"${OPENROUTER_API_KEY}\"
+    export MACBOOK_TAILSCALE_IP=\"${MACBOOK_TAILSCALE_IP}\"
+    export OPENAI_API_KEY=\"${OPENAI_API_KEY:-}\"
+    export ELEVENLABS_API_KEY=\"${ELEVENLABS_API_KEY:-}\"
     chmod +x /tmp/remote/*.sh
     /tmp/remote/init.sh
-"
+'"
 
 SSH_EXIT_CODE=$?
 
