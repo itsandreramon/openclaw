@@ -16,10 +16,6 @@ Create a `.env` file or enter values when prompted.
 |----------|----------|-------------|
 | `TAILSCALE_AUTH_KEY` | Yes | [admin.tailscale.com](https://admin.tailscale.com) → Settings → Keys → Generate auth key |
 | `OPENROUTER_API_KEY` | Yes | [openrouter.ai/keys](https://openrouter.ai/keys) |
-| `TELEGRAM_BOT_TOKEN` | No | [@BotFather](https://t.me/BotFather) → /newbot → copy token |
-| `TELEGRAM_USER_ID` | No | [@userinfobot](https://t.me/userinfobot) → /start → copy ID |
-| `OPENCLAW_MODEL` | No | Default: `openrouter/minimax/minimax-m2.5` (fallback: `meta-llama/llama-3.3-70b-instruct:free`) |
-| `BRAVE_SEARCH_API_KEY` | No | [brave.com/search/api](https://brave.com/search/api/) for web search |
 | `OPENAI_API_KEY` | No | For Whisper speech-to-text |
 | `ELEVENLABS_API_KEY` | No | For text-to-speech |
 
@@ -49,7 +45,6 @@ The setup will:
 | Docker | Docker + Docker Compose |
 | OpenClaw | Clone to `/opt/openclaw` |
 | Environment | API keys in `/opt/openclaw/.env` |
-| Config | `~/.openclaw/openclaw.json` (if Telegram configured) |
 | Auto-updates | Daily 3am UTC cron job |
 | Firewall | UFW restricts SSH to your Tailscale IP |
 
@@ -69,7 +64,7 @@ cd /opt/openclaw
 
 # set model with free fallback
 docker compose run --rm openclaw-cli config set agents.defaults.model.primary "openrouter/minimax/minimax-m2.5"
-docker compose run --rm openclaw-cli config set agents.defaults.model.fallbacks '["meta-llama/llama-3.3-70b-instruct:free"]'
+docker compose run --rm openclaw-cli config set agents.defaults.model.fallbacks '["openrouter/meta-llama/llama-3.3-70b-instruct:free"]'
 
 # configure telegram
 docker compose run --rm openclaw-cli config set channels.telegram.enabled true
