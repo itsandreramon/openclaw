@@ -50,12 +50,12 @@ The setup will:
 
 ## Post-Setup
 
-After setup completes, SSH in and start OpenClaw:
+After setup completes, SSH in and run the setup wizard:
 
 ```bash
 ssh root@<tailscale-ip>
 cd /opt/openclaw
-docker compose up -d
+./docker-setup.sh
 ```
 
 Dashboard: `http://<tailscale-ip>:18789`
