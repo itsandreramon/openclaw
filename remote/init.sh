@@ -7,7 +7,7 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 # shellcheck source=common.sh
 source ./common.sh
 
-TOTAL_STEPS=8
+TOTAL_STEPS=7
 CURRENT_STEP=0
 
 run_step() {
@@ -40,7 +40,7 @@ run_step "Docker & OpenClaw" ./setup-openclaw.sh
 run_step "Environment" ./setup-env.sh
 run_step "Auto-updates" ./setup-cron.sh
 
-# run docker setup (creates base config via onboarding)
+# run docker setup (creates config via onboarding)
 CURRENT_STEP=$((CURRENT_STEP + 1))
 echo -e "\n${YELLOW}[${CURRENT_STEP}/${TOTAL_STEPS}]${NC} Docker setup (this may take a few minutes)"
 cd /opt/openclaw
@@ -51,9 +51,6 @@ else
     exit 1
 fi
 cd /tmp/remote
-
-# apply our config after onboarding
-run_step "OpenClaw config" ./setup-openclaw-config.sh
 
 # summary before firewall cuts public SSH
 echo ""

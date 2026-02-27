@@ -59,7 +59,30 @@ Setup runs automatically. Once complete, access the dashboard at:
 
 `http://<tailscale-ip>:18789`
 
-If you skipped auto-config during setup, SSH in and run `openclaw onboard` inside the container.
+## Configure Telegram & Web Search
+
+After setup, SSH in and configure via CLI:
+
+```bash
+ssh root@<tailscale-ip>
+cd /opt/openclaw
+
+# set model with free fallback
+docker compose run --rm openclaw-cli config set agents.defaults.model.primary "openrouter/minimax/minimax-m2.5"
+docker compose run --rm openclaw-cli config set agents.defaults.model.fallbacks '["meta-llama/llama-3.3-70b-instruct:free"]'
+
+# configure telegram
+docker compose run --rm openclaw-cli config set channels.telegram.enabled true
+docker compose run --rm openclaw-cli config set channels.telegram.botToken "YOUR_BOT_TOKEN"
+docker compose run --rm openclaw-cli config set channels.telegram.dmPolicy "allowlist"
+docker compose run --rm openclaw-cli config set channels.telegram.allowFrom '["tg:YOUR_USER_ID"]'
+
+# configure web search (optional)
+docker compose run --rm openclaw-cli config set tools.web.search.apiKey "YOUR_BRAVE_API_KEY"
+
+# restart gateway to apply changes
+docker compose restart openclaw-gateway
+```
 
 ## Managing
 
