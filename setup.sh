@@ -140,6 +140,10 @@ SSH_EXIT_CODE=$?
 
 if [[ $SSH_EXIT_CODE -eq 0 ]]; then
     log_ok "Setup complete"
+    echo ""
+    echo "Starting OpenClaw setup wizard..."
+    echo ""
+    ssh -t "root@${VPS_HOST}" "cd /opt/openclaw && ./docker-setup.sh"
 else
     log_fail "Setup failed (exit code ${SSH_EXIT_CODE})"
 fi

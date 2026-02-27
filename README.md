@@ -50,13 +50,8 @@ The setup will:
 
 ## Post-Setup
 
-After setup completes, SSH in and run the setup wizard:
-
-```bash
-ssh root@<tailscale-ip>
-cd /opt/openclaw
-./docker-setup.sh
-```
+The setup wizard runs automatically after provisioning. Complete the interactive
+onboarding to configure your instance.
 
 Dashboard: `http://<tailscale-ip>:18789`
 

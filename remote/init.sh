@@ -7,7 +7,7 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 # shellcheck source=common.sh
 source ./common.sh
 
-TOTAL_STEPS=7
+TOTAL_STEPS=6
 CURRENT_STEP=0
 
 run_step() {
@@ -39,18 +39,6 @@ fi
 run_step "Docker & OpenClaw" ./setup-openclaw.sh
 run_step "Environment" ./setup-env.sh
 run_step "Auto-updates" ./setup-cron.sh
-
-# run docker setup (creates config via onboarding)
-CURRENT_STEP=$((CURRENT_STEP + 1))
-echo -e "\n${YELLOW}[${CURRENT_STEP}/${TOTAL_STEPS}]${NC} Docker setup (this may take a few minutes)"
-cd /opt/openclaw
-if ./docker-setup.sh </dev/null >/dev/null 2>&1; then
-    echo -e "${GREEN}[OK]${NC} Docker setup"
-else
-    echo -e "${RED}[FAIL]${NC} Docker setup"
-    exit 1
-fi
-cd /tmp/remote
 
 # summary before firewall cuts public SSH
 echo ""
