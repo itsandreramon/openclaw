@@ -50,9 +50,15 @@ The setup will:
 
 ## Post-Setup
 
-Setup runs automatically. Once complete, access the dashboard at:
+After setup completes, SSH in and start OpenClaw:
 
-`http://<tailscale-ip>:18789`
+```bash
+ssh root@<tailscale-ip>
+cd /opt/openclaw
+docker compose up -d
+```
+
+Dashboard: `http://<tailscale-ip>:18789`
 
 ## Configure Telegram & Web Search
 
