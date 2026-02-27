@@ -13,11 +13,8 @@ BRAVE_SEARCH_API_KEY="${BRAVE_SEARCH_API_KEY:-}"
 
 # skip if no telegram config provided
 if [[ -z "$TELEGRAM_BOT_TOKEN" ]]; then
-    log_ok "OpenClaw config skipped (no telegram token)"
     exit 0
 fi
-
-log_step "Configuring OpenClaw"
 
 # initialize config
 openclaw setup >/dev/null 2>&1 || true
@@ -37,5 +34,3 @@ if [[ -n "$BRAVE_SEARCH_API_KEY" ]]; then
     openclaw config set tools.web.search.provider "brave" >/dev/null 2>&1
     openclaw config set tools.web.search.apiKey "${BRAVE_SEARCH_API_KEY}" >/dev/null 2>&1
 fi
-
-log_ok "OpenClaw configured"

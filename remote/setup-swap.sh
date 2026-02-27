@@ -6,7 +6,6 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 # shellcheck source=common.sh
 source ./common.sh
 
-log_step "Setting up swap"
 if [[ ! -f /swapfile ]]; then
     fallocate -l 4G /swapfile
     chmod 600 /swapfile
@@ -14,4 +13,3 @@ if [[ ! -f /swapfile ]]; then
     swapon /swapfile
     echo '/swapfile none swap sw 0 0' >> /etc/fstab
 fi
-log_ok "Swap configured (4GB)"
